@@ -56,8 +56,8 @@ func (ui *UI) showApplicationDetail() {
 	shortcutsBar := tview.NewTextView().
 		SetDynamicColors(true).
 		SetTextAlign(tview.AlignCenter).
-		SetText(fmt.Sprintf("[%s]Enter/Double-click[-] View Findings  [%s]ESC[-] Back  [%s]q[-] Quit",
-			ui.theme.Info, ui.theme.Info, ui.theme.Info))
+		SetText(fmt.Sprintf("[%s]↑/↓[-] Navigate  [%s]Enter/Double-click[-] View Findings  [%s]ESC[-] Back  [%s]q[-] Quit",
+			ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
 	shortcutsBar.SetBorder(false)
 
 	ui.detailFlex.AddItem(shortcutsBar, 1, 0, false)
@@ -235,6 +235,14 @@ func (ui *UI) updateApplicationDetailViews() {
 			AddItem(ui.complianceView, 0, 1, false).
 			AddItem(ui.recentScansView, 0, 1, false)
 
+		// Create keyboard shortcuts bar
+		shortcutsBar := tview.NewTextView().
+			SetDynamicColors(true).
+			SetTextAlign(tview.AlignCenter).
+			SetText(fmt.Sprintf("[%s]↑/↓[-] Navigate  [%s]Enter/Double-click[-] View Findings  [%s]ESC[-] Back  [%s]q[-] Quit",
+				ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
+		shortcutsBar.SetBorder(false)
+
 		// Clear and rebuild the detail flex
 		ui.detailFlex.Clear()
 		ui.detailFlex.SetDirection(tview.FlexRow)
@@ -245,7 +253,8 @@ func (ui *UI) updateApplicationDetailViews() {
 		}
 
 		ui.detailFlex.AddItem(topRow, topRowHeight, 0, false).
-			AddItem(ui.contextsTable, 0, 1, true)
+			AddItem(ui.contextsTable, 0, 1, true).
+			AddItem(shortcutsBar, 1, 0, false)
 	}
 
 	// Update contexts table

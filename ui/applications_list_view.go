@@ -25,13 +25,13 @@ func (ui *UI) setupApplicationsView() {
 			ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
 	shortcutsBar.SetBorder(false)
 
-	// Layout: header, search, table, status bar, shortcuts
+	// Layout: header, search, status bar, table, shortcuts
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(headerWidget, 3, 0, false).
 		AddItem(searchWidget, 3, 0, false).
-		AddItem(applicationsWidget, 0, 1, true).
 		AddItem(statusWidget, 1, 0, false).
+		AddItem(applicationsWidget, 0, 1, true).
 		AddItem(shortcutsBar, 1, 0, false)
 
 	// Set initial focus to table
@@ -337,11 +337,9 @@ func (ui *UI) updateStatusBar() {
 		appsToShow = ui.applications
 	}
 
-	statusText := fmt.Sprintf("Showing %d applications", len(appsToShow))
+	statusText := fmt.Sprintf(" Showing %d applications", len(appsToShow))
 	if ui.totalPages > 1 {
 		statusText += fmt.Sprintf(" • Page %d/%d (Total: %d)", ui.currentPage+1, ui.totalPages, ui.totalApps)
-		statusText += " • Press 'n' for next page, 'p' for previous"
 	}
-	statusText += " • Press '/' to search, 'q' or Esc to quit"
 	ui.statusBar.SetText(statusText)
 }
