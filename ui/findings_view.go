@@ -195,19 +195,25 @@ func (ui *UI) initializeFindingsView() {
 		}
 		if row > 0 && row-1 < len(ui.findings) {
 			ui.selectedFinding = &ui.findings[row-1]
-			ui.showFindingDetail()
+			if ui.selectedFinding.ScanType == findings.ScanTypeSCA {
+				ui.showSCAFindingDetail()
+			} else {
+				ui.showFindingDetail()
+			}
 		}
 	})
 
-	// Add double-click support
+	// Add double-click support for non-SCA views
 	ui.findingsTable.SetMouseCapture(func(action tview.MouseAction, event *tcell.EventMouse) (tview.MouseAction, *tcell.EventMouse) {
 		if action == tview.MouseLeftDoubleClick {
 			row, _ := ui.findingsTable.GetSelection()
-			if row > 0 && row-1 < len(ui.findings) {
-				ui.selectedFinding = &ui.findings[row-1]
-				ui.showFindingDetail()
+			// Only handle double-click for non-SCA views
+			if row > 0 && ui.findingsScanFilter != findings.ScanFilterSCA {
+				if row-1 < len(ui.findings) {
+					ui.selectedFinding = &ui.findings[row-1]
+					ui.showFindingDetail()
+				}
 			}
-			return action, nil
 		}
 		return action, event
 	})
@@ -1004,12 +1010,12 @@ func (ui *UI) handleSCARowSelection(row int) {
 
 		// Skip expanded CVE rows
 		if ui.scaExpandedComponents[comp.Name+"|"+comp.Version] {
-			if row > currentRow && row < currentRow+len(comp.CVEs) {
-				// Clicked on a CVE row - show detail
+			if row >= currentRow && row < currentRow+len(comp.CVEs) {
+				// Clicked on a CVE row - show SCA detail
 				cveIndex := row - currentRow
 				if cveIndex < len(comp.CVEs) {
 					ui.selectedFinding = comp.CVEs[cveIndex]
-					ui.showFindingDetail()
+					ui.showSCAFindingDetail()
 				}
 				return
 			}

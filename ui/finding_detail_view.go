@@ -93,9 +93,14 @@ func (ui *UI) showFindingDetail() {
 	// Create keyboard shortcuts bar
 	shortcutsBar := tview.NewTextView().
 		SetDynamicColors(true).
-		SetTextAlign(tview.AlignCenter).
-		SetText(fmt.Sprintf("[%s]ESC[-] Back  [%s]q[-] Quit  [%s]m[-] Mitigations  [%s]Tab[-] Navigate  [%s]←/→[-] Data Paths",
+		SetTextAlign(tview.AlignCenter)
+	if finding.ScanType == findings.ScanTypeStatic {
+		shortcutsBar.SetText(fmt.Sprintf("[%s]ESC[-] Back  [%s]q[-] Quit  [%s]m[-] Mitigations  [%s]Tab[-] Navigate  [%s]←/→[-] Data Paths",
 			ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
+	} else {
+		shortcutsBar.SetText(fmt.Sprintf("[%s]ESC[-] Back  [%s]q[-] Quit  [%s]m[-] Mitigations  [%s]Tab[-] Navigate",
+			ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
+	}
 	shortcutsBar.SetBorder(false)
 
 	mainLayout := tview.NewFlex().
@@ -416,9 +421,9 @@ func (ui *UI) appendPolicyInfo(sb *strings.Builder, finding *findings.Finding) {
 	if isMitigated {
 		sb.WriteString(fmt.Sprintf("[green]%s Mitigated (Approved)[-]\n", EmojiPassesPolicy))
 	} else if finding.ViolatesPolicy {
-		sb.WriteString(fmt.Sprintf("[red]%s Violates Policy[-]\n", EmojiViolatesPolicy))
+		sb.WriteString(fmt.Sprintf("[red]%s Violates Policy[-]", EmojiViolatesPolicy))
 	} else {
-		sb.WriteString("[white]Does not affect policy[-]\n")
+		sb.WriteString("[white]Does not affect policy[-]")
 	}
 }
 
@@ -469,12 +474,54 @@ func (ui *UI) buildFindingStatusContent(finding *findings.Finding) string {
 // buildDynamicScanDetails builds details for dynamic scan findings
 func (ui *UI) buildDynamicScanDetails(details map[string]interface{}) string {
 	var sb strings.Builder
-	if url, ok := details["url"].(string); ok && url != "" {
+
+	// Attack Vector
+	if attackVector, ok := details["attack_vector"].(string); ok && attackVector != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Attack Vector:[-] [white]%s[-]\n\n", ui.theme.Label, attackVector))
+	}
+
+	// Hostname
+	if hostname, ok := details["hostname"].(string); ok && hostname != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Hostname:[-] [white]%s[-]\n", ui.theme.Label, hostname))
+	}
+
+	// Port
+	if port, ok := details["port"].(string); ok && port != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Port:[-] [white]%s[-]\n", ui.theme.Label, port))
+	}
+
+	// Path
+	if path, ok := details["path"].(string); ok && path != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Path:[-] [white]%s[-]\n", ui.theme.Label, path))
+	}
+
+	// URL
+	if url, ok := details["URL"].(string); ok && url != "" {
 		sb.WriteString(fmt.Sprintf("[%s]URL:[-]\n[white]%s[-]\n\n", ui.theme.Label, url))
 	}
+
+	// Vulnerable Parameter
 	if param, ok := details["vulnerable_parameter"].(string); ok && param != "" {
 		sb.WriteString(fmt.Sprintf("[%s]Vulnerable Parameter:[-] [white]%s[-]\n", ui.theme.Label, param))
 	}
+
+	// Plugin
+	if plugin, ok := details["plugin"].(string); ok && plugin != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Plugin:[-] [white]%s[-]\n", ui.theme.Label, plugin))
+	}
+
+	// Finding Category - can be string or number
+	if category, ok := details["finding_category"].(string); ok && category != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Finding Category:[-] [white]%s[-]\n", ui.theme.Label, category))
+	} else if categoryNum, ok := details["finding_category"].(float64); ok {
+		sb.WriteString(fmt.Sprintf("[%s]Finding Category:[-] [white]%d[-]\n", ui.theme.Label, int(categoryNum)))
+	}
+
+	// Discovered by VSA
+	if vsa, ok := details["discovered_by_vsa"].(string); ok && vsa != "" {
+		sb.WriteString(fmt.Sprintf("[%s]Discovered by VSA:[-] [white]%s[-]\n", ui.theme.Label, vsa))
+	}
+
 	return sb.String()
 }
 
@@ -734,6 +781,8 @@ func (ui *UI) getStatusColorHex(finding *findings.Finding) string {
 // processCWEDescription extracts the short description from CWE name if it exists in brackets
 // Example: "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') "
 // Returns: "OS Command Injection"
+// Example: "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"
+// Returns: "Basic XSS"
 func processCWEDescription(name string) string {
 	// Look for pattern: ('...')
 	re := regexp.MustCompile(`\('([^']+)'\)`)
@@ -741,6 +790,14 @@ func processCWEDescription(name string) string {
 	if len(matches) > 1 {
 		return strings.TrimSpace(matches[1])
 	}
+
+	// Look for pattern: (...)
+	re2 := regexp.MustCompile(`\(([^)]+)\)`)
+	matches2 := re2.FindStringSubmatch(name)
+	if len(matches2) > 1 {
+		return strings.TrimSpace(matches2[1])
+	}
+
 	return name
 }
 
