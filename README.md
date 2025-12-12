@@ -390,7 +390,7 @@ MIT License - feel free to use this project for your own purposes.
 
 ## Resources
 
-- [Veracode API Documentation](https://docs.veracode.com/r/c_about_veracode_api)
-- [Veracode HMAC Authentication](https://docs.veracode.com/r/c_hmac_signing_example)
+- [Veracode API Documentation](https://docs.veracode.com/r/Veracode_APIs)
+- [Veracode HMAC Authentication](https://docs.veracode.com/r/c_enabling_hmac)
 - [tview Documentation](https://github.com/rivo/tview)
 - [tcell Documentation](https://github.com/gdamore/tcell)
