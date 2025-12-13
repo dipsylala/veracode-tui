@@ -20,7 +20,4 @@ const (
 	EmojiPending  = "⏳" // U+23F3 - Hourglass (pending/in progress)
 	EmojiUnknown  = "❓" // U+2753 - Question mark (unknown status)
 	EmojiComment  = "💬" // U+1F4AC - Speech balloon (comment)
-
-	// Common UI text
-	TextNotAvailable = "N/A"
 )

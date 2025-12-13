@@ -40,13 +40,13 @@ func (ui *UI) showFindingDetail() {
 	finding := ui.selectedFinding
 
 	// Determine context name
-	contextName := "Policy Scan"
+	contextName := DefaultContextName
 	if finding.ContextType == findings.ContextTypeSandbox && ui.selectionIndex >= 0 && ui.selectionIndex < len(ui.sandboxes) {
 		contextName = ui.sandboxes[ui.selectionIndex].Name
 	}
 
 	// Get application name
-	appName := "Unknown Application"
+	appName := DefaultApplicationName
 	if ui.selectedApp != nil && ui.selectedApp.Profile != nil {
 		appName = ui.selectedApp.Profile.Name
 	}
@@ -472,6 +472,8 @@ func (ui *UI) buildFindingStatusContent(finding *findings.Finding) string {
 }
 
 // buildDynamicScanDetails builds details for dynamic scan findings
+//
+//nolint:gocyclo // Simple display logic but for multiple field types
 func (ui *UI) buildDynamicScanDetails(details map[string]interface{}) string {
 	var sb strings.Builder
 

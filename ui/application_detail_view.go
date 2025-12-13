@@ -28,7 +28,7 @@ func (ui *UI) showApplicationDetail() {
 	ui.sandboxes = []applications.Sandbox{}
 
 	// Get application name for title
-	appName := "Unknown Application"
+	appName := DefaultApplicationName
 	if ui.selectedApp.Profile != nil {
 		appName = ui.selectedApp.Profile.Name
 	}

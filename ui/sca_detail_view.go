@@ -19,13 +19,13 @@ func (ui *UI) showSCAFindingDetail() {
 	finding := ui.selectedFinding
 
 	// Determine context name
-	contextName := "Policy Scan"
+	contextName := DefaultContextName
 	if finding.ContextType == findings.ContextTypeSandbox && ui.selectionIndex >= 0 && ui.selectionIndex < len(ui.sandboxes) {
 		contextName = ui.sandboxes[ui.selectionIndex].Name
 	}
 
 	// Get application name
-	appName := "Unknown Application"
+	appName := DefaultApplicationName
 	if ui.selectedApp != nil && ui.selectedApp.Profile != nil {
 		appName = ui.selectedApp.Profile.Name
 	}
@@ -296,6 +296,77 @@ func (ui *UI) buildSCACVEDetailsContent(finding *findings.Finding) string {
 	return sb.String()
 }
 
+// formatComponentPaths formats component path information for display
+func (ui *UI) formatComponentPaths(componentPaths []interface{}) string {
+	var sb strings.Builder
+
+	if len(componentPaths) == 0 {
+		return ""
+	}
+
+	pathLabel := "Component Path"
+	if len(componentPaths) > 1 {
+		pathLabel = "Component Paths"
+	}
+	sb.WriteString(fmt.Sprintf("[%s]%s:[-]\n", ui.theme.Label, pathLabel))
+
+	for _, pathItem := range componentPaths {
+		pathObj, ok := pathItem.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		if pathStr, ok := pathObj["path"].(string); ok {
+			sb.WriteString(fmt.Sprintf("  [white]%s[-]\n", pathStr))
+		}
+	}
+	sb.WriteString("\n")
+
+	return sb.String()
+}
+
+// formatLicenses formats license information for display
+func (ui *UI) formatLicenses(licenses []interface{}) string {
+	var sb strings.Builder
+
+	if len(licenses) == 0 {
+		return fmt.Sprintf("[%s]Licenses:[-] [white]None[-]\n", ui.theme.Label)
+	}
+
+	licenseLabel := "License"
+	if len(licenses) > 1 {
+		licenseLabel = "Licenses"
+	}
+	sb.WriteString(fmt.Sprintf("[%s]%s:[-]\n", ui.theme.Label, licenseLabel))
+
+	for _, licenseItem := range licenses {
+		licenseObj, ok := licenseItem.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		var licenseID, riskRating string
+		if id, ok := licenseObj["license_id"].(string); ok {
+			licenseID = id
+		}
+		if risk, ok := licenseObj["risk_rating"].(string); ok {
+			riskRating = risk
+		}
+
+		if licenseID == "" {
+			continue
+		}
+
+		if riskRating != "" {
+			sb.WriteString(fmt.Sprintf("  [white]%s[-] [%s](Risk: %s)[-]\n", licenseID, ui.theme.SecondaryText, riskRating))
+		} else {
+			sb.WriteString(fmt.Sprintf("  [white]%s[-]\n", licenseID))
+		}
+	}
+
+	return sb.String()
+}
+
 // buildComponentDetailsContent builds the component-specific details for SCA findings
 func (ui *UI) buildComponentDetailsContent(finding *findings.Finding) string {
 	var sb strings.Builder
@@ -307,21 +378,8 @@ func (ui *UI) buildComponentDetailsContent(finding *findings.Finding) string {
 	}
 
 	// Component path(s) - array of objects with "path" property
-	if componentPaths, ok := details["component_path"].([]interface{}); ok && len(componentPaths) > 0 {
-		if len(componentPaths) == 1 {
-			sb.WriteString(fmt.Sprintf("[%s]Component Path:[-]\n", ui.theme.Label))
-		} else {
-			sb.WriteString(fmt.Sprintf("[%s]Component Paths:[-]\n", ui.theme.Label))
-		}
-		for _, pathItem := range componentPaths {
-			// Each item is an object with a "path" property
-			if pathObj, ok := pathItem.(map[string]interface{}); ok {
-				if pathStr, ok := pathObj["path"].(string); ok {
-					sb.WriteString(fmt.Sprintf("  [white]%s[-]\n", pathStr))
-				}
-			}
-		}
-		sb.WriteString("\n")
+	if componentPaths, ok := details["component_path"].([]interface{}); ok {
+		sb.WriteString(ui.formatComponentPaths(componentPaths))
 	}
 
 	// Language
@@ -329,34 +387,9 @@ func (ui *UI) buildComponentDetailsContent(finding *findings.Finding) string {
 		sb.WriteString(fmt.Sprintf("[%s]Language:[-] [white]%s[-]\n", ui.theme.Label, language))
 	}
 
-	// Licenses - can be array of objects with license_id and risk_rating
-	if licenses, ok := details["licenses"].([]interface{}); ok && len(licenses) > 0 {
-		if len(licenses) == 1 {
-			sb.WriteString(fmt.Sprintf("[%s]License:[-]\n", ui.theme.Label))
-		} else {
-			sb.WriteString(fmt.Sprintf("[%s]Licenses:[-]\n", ui.theme.Label))
-		}
-		for _, licenseItem := range licenses {
-			if licenseObj, ok := licenseItem.(map[string]interface{}); ok {
-				var licenseID, riskRating string
-				if id, ok := licenseObj["license_id"].(string); ok {
-					licenseID = id
-				}
-				if risk, ok := licenseObj["risk_rating"].(string); ok {
-					riskRating = risk
-				}
-				if licenseID != "" {
-					if riskRating != "" {
-						sb.WriteString(fmt.Sprintf("  [white]%s[-] [%s](Risk: %s)[-]\n", licenseID, ui.theme.SecondaryText, riskRating))
-					} else {
-						sb.WriteString(fmt.Sprintf("  [white]%s[-]\n", licenseID))
-					}
-				}
-			}
-		}
-	} else if license, ok := details["licenses"].(string); ok && license != "" {
-		// Fallback if licenses is a plain string
-		sb.WriteString(fmt.Sprintf("[%s]Licenses:[-] [white]%s[-]\n", ui.theme.Label, license))
+	// Licenses - array of objects with license_id and risk_rating
+	if licenses, ok := details["licenses"].([]interface{}); ok {
+		sb.WriteString(ui.formatLicenses(licenses))
 	}
 
 	// Vulnerable methods if available
