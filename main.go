@@ -14,6 +14,9 @@ import (
 	"github.com/dipsylala/veracode-tui/veracode"
 )
 
+// Version is the application version, can be set at build time with -ldflags "-X main.Version=x.y.z"
+var Version = "dev"
+
 func main() {
 	healthcheck := flag.Bool("healthcheck", false, "Perform a healthcheck and exit (does not open TUI)")
 	version := flag.Bool("version", false, "Display version information")
@@ -45,7 +48,7 @@ func main() {
 	}
 
 	if *version {
-		fmt.Println("Veracode TUI v1.0.0")
+		fmt.Printf("Veracode TUI v%s\n", Version)
 		fmt.Println("Built with Go - A read-only interface to Veracode API")
 		os.Exit(0)
 	}

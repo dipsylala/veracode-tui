@@ -925,6 +925,39 @@ This application integrates with the following Veracode REST APIs:
 
 ## Build & Run
 
+### Version Management
+
+The application version is stored as a package-level variable in `main.go`:
+
+```go
+// Version is the application version, can be set at build time with -ldflags "-X main.Version=x.y.z"
+var Version = "dev"
+```
+
+**Build with Version Injection:**
+```bash
+go build -ldflags "-X main.Version=1.0.0" -o veracode-tui.exe
+```
+
+**Default Development Build:**
+```bash
+go build -o veracode-tui.exe  # Uses "dev" as version
+```
+
+**Display Version:**
+```bash
+.\veracode-tui.exe --version
+# Output: Veracode TUI vdev
+# or with injected version: Veracode TUI v1.0.0
+```
+
+**Accessing at Runtime:**
+The `main.Version` variable is exported and can be accessed from other packages:
+```go
+import "main"
+fmt.Println(main.Version)
+```
+
 ### Build
 ```bash
 go build -o veracode-tui.exe

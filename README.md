@@ -289,6 +289,23 @@ This installs:
 - golangci-lint (linter)
 - goimports (code formatter)
 
+### Version Management
+
+The application version is stored in `main.Version` variable and can be set at build time:
+
+```bash
+# Build with version injection
+go build -ldflags "-X main.Version=1.0.0" -o veracode-tui.exe
+
+# Default version (development builds)
+go build -o veracode-tui.exe  # Uses "dev" as version
+```
+
+The version is displayed via:
+```bash
+.\veracode-tui.exe --version
+```
+
 ### Build and Test
 
 ```bash
