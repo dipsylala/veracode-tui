@@ -17,12 +17,18 @@ A Terminal User Interface (TUI) application for accessing Veracode's API, built 
 ###
 Show ALL the findings
 
-![Findings screem](images/findings.png "The findings")
+![Findings screnm](images/findings.png "The findings")
 
 ###
 Show the finding details
 
-![Findings screem](images/finding-details.png "The finding details")
+![Findings screen](images/finding-details.png "The static finding details")
+
+
+###
+SCA is covered too
+
+![SCA details screen](images/sca-details.png "The SCA details")
 
 
 ## Prerequisites
