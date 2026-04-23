@@ -103,7 +103,7 @@ func NewUI(appService *applications.Service, findingsService *findings.Service, 
 		findingsSeverityFilter: 0,
 		findingsPolicyFilter:   findings.PolicyFilterAll,
 		currentPage:            0,
-		pageSize:               100,
+		pageSize:               500,
 		scaExpandedComponents:  make(map[string]bool),
 	}
 

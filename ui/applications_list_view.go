@@ -597,9 +597,10 @@ func (ui *UI) renderApplicationsTable() {
 		ui.applicationsTable.SetCell(rowNum, 5, tview.NewTableCell(scanStatus))
 	}
 
-	// Select first data row if available
+	// Select first data row and scroll to top
 	if len(appsToShow) > 0 {
 		ui.applicationsTable.Select(1, 0)
+		ui.applicationsTable.ScrollToBeginning()
 	}
 }
 
