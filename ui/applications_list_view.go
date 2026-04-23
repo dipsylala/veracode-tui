@@ -22,7 +22,7 @@ func (ui *UI) setupApplicationsView() {
 	shortcutsBar := tview.NewTextView().
 		SetDynamicColors(true).
 		SetTextAlign(tview.AlignCenter).
-		SetText(fmt.Sprintf("[%s]Enter/Double-click[-] Details  [%s]n/s/t/m/a[-] Filters  [%s]PgDn/PgUp[-] Next/Prev Page  [%s]q/ESC[-] Quit",
+		SetText(fmt.Sprintf("[%s]Enter/Double-click[-] Details  [%s]n/s/t/m/a[-] Filters  [%s][[] / ][-] Next/Prev Page  [%s]q/ESC[-] Quit",
 			ui.theme.Info, ui.theme.Info, ui.theme.Info, ui.theme.Info))
 	shortcutsBar.SetBorder(false)
 
@@ -363,22 +363,6 @@ func (ui *UI) handleApplicationsTableInput(event *tcell.EventKey) *tcell.EventKe
 	case tcell.KeyCtrlC, tcell.KeyEscape:
 		ui.app.Stop()
 		return nil
-	case tcell.KeyPgDn:
-		if ui.currentPage < ui.totalPages-1 {
-			ui.currentPage++
-			go func() {
-				ui.loadApplications()
-			}()
-		}
-		return nil
-	case tcell.KeyPgUp:
-		if ui.currentPage > 0 {
-			ui.currentPage--
-			go func() {
-				ui.loadApplications()
-			}()
-		}
-		return nil
 	case tcell.KeyRune:
 		return ui.handleApplicationsTableRune(event.Rune())
 	}
@@ -405,6 +389,18 @@ func (ui *UI) handleApplicationsTableRune(r rune) *tcell.EventKey {
 		return nil
 	case 'a':
 		ui.app.SetFocus(ui.applicationsTable)
+		return nil
+	case ']':
+		if ui.currentPage < ui.totalPages-1 {
+			ui.currentPage++
+			go ui.loadApplications()
+		}
+		return nil
+	case '[':
+		if ui.currentPage > 0 {
+			ui.currentPage--
+			go ui.loadApplications()
+		}
 		return nil
 	}
 	return nil
