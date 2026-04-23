@@ -120,11 +120,13 @@ go run main.go
 ### Command-line Options
 
 ```
-veracode-tui              Start the interactive TUI
-veracode-tui --healthcheck  Test API connectivity and credentials
-veracode-tui --version      Show version information
-veracode-tui --no-color     Disable colors (monochrome mode)
-veracode-tui --help         Show this help message
+veracode-tui                       Start the interactive TUI
+veracode-tui --healthcheck         Test API connectivity and credentials
+veracode-tui --version             Show version information
+veracode-tui --no-color            Disable colors (monochrome mode)
+veracode-tui --theme <name>        Set color theme: default, bw, hotdog, matrix (default: default)
+veracode-tui --help                Show this help message
+veracode-tui --debug-log <file>    Log all REST requests/responses to file
 ```
 
 **Environment Variables:**
