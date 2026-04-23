@@ -276,8 +276,10 @@ func (ui *UI) buildSCACVEDetailsContent(finding *findings.Finding) string {
 			encodedCVE := url.QueryEscape(cveName)
 			veracodeSearchURL := fmt.Sprintf("https://sca.analysiscenter.veracode.com/vulnerability-database/search#query=%s", encodedCVE)
 			exploitDBSearchURL := fmt.Sprintf("https://www.exploit-db.com/search?cve=%s", encodedCVE)
+			osvSearchURL := fmt.Sprintf("https://osv.dev/list?q=%s", encodedCVE)
 			sb.WriteString(fmt.Sprintf("  [:::%s]Veracode SCA[:::-]\n", veracodeSearchURL))
 			sb.WriteString(fmt.Sprintf("  [:::%s]Exploit-DB[:::-]\n", exploitDBSearchURL))
+			sb.WriteString(fmt.Sprintf("  [:::%s]OSV[:::-]\n", osvSearchURL))
 		}
 
 	}
