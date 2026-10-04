@@ -2,6 +2,8 @@
 
 A Terminal User Interface (TUI) application for accessing Veracode's API, built with Go.
 
+As of October 2026, I no longer have a Veracode license, so I can't verify whether the following still works as Veracode's technology stack evolves.
+
 ## Features
 
 - 🔐 Secure credential management via `~/.veracode/veracode.yml`
